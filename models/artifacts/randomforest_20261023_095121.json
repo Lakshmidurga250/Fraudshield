@@ -1,0 +1,109 @@
+{
+  "version": "randomforest_20261023_095121",
+  "model_name": "RandomForest-Comparative",
+  "algorithm_type": "RandomForest",
+  "dataset_fingerprint": "ed17145e4a64f2d4",
+  "decision_threshold": 0.5,
+  "sha256_checksum": "8785fb8b3178230346679f18e53e7f24574ff14cf23fdeb0355cbb364aa23f3d",
+  "artifact_filename": "randomforest_20261023_095121.joblib",
+  "metrics": {
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "raw_accuracy": 1.0,
+    "decision_threshold": 0.5,
+    "training_samples": 92,
+    "test_samples": 23,
+    "confusion_matrix": {
+      "true_negatives": 20,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_positives": 3
+    },
+    "class_distribution": {
+      "actual_fraud": 3,
+      "actual_non_fraud": 20,
+      "predicted_fraud": 3,
+      "predicted_non_fraud": 20
+    },
+    "roc_curve_points": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": 0.0,
+        "y": 0.3333
+      },
+      {
+        "x": 0.0,
+        "y": 1.0
+      },
+      {
+        "x": 0.15,
+        "y": 1.0
+      },
+      {
+        "x": 0.35,
+        "y": 1.0
+      },
+      {
+        "x": 0.75,
+        "y": 1.0
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      }
+    ],
+    "pr_curve_points": [
+      {
+        "x": 1.0,
+        "y": 0.1304
+      },
+      {
+        "x": 1.0,
+        "y": 0.1667
+      },
+      {
+        "x": 1.0,
+        "y": 0.3
+      },
+      {
+        "x": 1.0,
+        "y": 0.5
+      },
+      {
+        "x": 1.0,
+        "y": 0.6
+      },
+      {
+        "x": 1.0,
+        "y": 0.75
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      },
+      {
+        "x": 0.6667,
+        "y": 1.0
+      },
+      {
+        "x": 0.3333,
+        "y": 1.0
+      },
+      {
+        "x": 0.0,
+        "y": 1.0
+      }
+    ],
+    "accuracy_warning": "In highly imbalanced transaction datasets (e.g., ~0.17% fraud rate), a trivial model predicting always-non-fraud achieves 99.8% raw accuracy while missing 100% of frauds. PR-AUC, Recall, and Precision are the primary decision-grade evaluation metrics.",
+    "algorithm": "RandomForest",
+    "dataset_origin": "Local Dataset",
+    "random_state": 42
+  },
+  "is_active": true
+}

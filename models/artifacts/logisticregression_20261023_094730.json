@@ -1,0 +1,237 @@
+{
+  "version": "logisticregression_20261023_094730",
+  "model_name": "LogisticRegression-Baseline",
+  "algorithm_type": "LogisticRegression",
+  "dataset_fingerprint": "18d8ac438b2fcee1",
+  "decision_threshold": 0.5,
+  "sha256_checksum": "706cafefe8fa5739c35f56f6091736d1925b2c2046bf4f50cf12e39392d5bc11",
+  "artifact_filename": "logisticregression_20261023_094730.joblib",
+  "metrics": {
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "raw_accuracy": 1.0,
+    "decision_threshold": 0.5,
+    "training_samples": 176,
+    "test_samples": 44,
+    "confusion_matrix": {
+      "true_negatives": 40,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "true_positives": 4
+    },
+    "class_distribution": {
+      "actual_fraud": 4,
+      "actual_non_fraud": 40,
+      "predicted_fraud": 4,
+      "predicted_non_fraud": 40
+    },
+    "roc_curve_points": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": 0.0,
+        "y": 0.25
+      },
+      {
+        "x": 0.0,
+        "y": 1.0
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      }
+    ],
+    "pr_curve_points": [
+      {
+        "x": 1.0,
+        "y": 0.0909
+      },
+      {
+        "x": 1.0,
+        "y": 0.093
+      },
+      {
+        "x": 1.0,
+        "y": 0.0952
+      },
+      {
+        "x": 1.0,
+        "y": 0.0976
+      },
+      {
+        "x": 1.0,
+        "y": 0.1
+      },
+      {
+        "x": 1.0,
+        "y": 0.1026
+      },
+      {
+        "x": 1.0,
+        "y": 0.1053
+      },
+      {
+        "x": 1.0,
+        "y": 0.1081
+      },
+      {
+        "x": 1.0,
+        "y": 0.1111
+      },
+      {
+        "x": 1.0,
+        "y": 0.1143
+      },
+      {
+        "x": 1.0,
+        "y": 0.1176
+      },
+      {
+        "x": 1.0,
+        "y": 0.1212
+      },
+      {
+        "x": 1.0,
+        "y": 0.125
+      },
+      {
+        "x": 1.0,
+        "y": 0.129
+      },
+      {
+        "x": 1.0,
+        "y": 0.1333
+      },
+      {
+        "x": 1.0,
+        "y": 0.1379
+      },
+      {
+        "x": 1.0,
+        "y": 0.1429
+      },
+      {
+        "x": 1.0,
+        "y": 0.1481
+      },
+      {
+        "x": 1.0,
+        "y": 0.1538
+      },
+      {
+        "x": 1.0,
+        "y": 0.16
+      },
+      {
+        "x": 1.0,
+        "y": 0.1667
+      },
+      {
+        "x": 1.0,
+        "y": 0.1739
+      },
+      {
+        "x": 1.0,
+        "y": 0.1818
+      },
+      {
+        "x": 1.0,
+        "y": 0.1905
+      },
+      {
+        "x": 1.0,
+        "y": 0.2
+      },
+      {
+        "x": 1.0,
+        "y": 0.2105
+      },
+      {
+        "x": 1.0,
+        "y": 0.2222
+      },
+      {
+        "x": 1.0,
+        "y": 0.2353
+      },
+      {
+        "x": 1.0,
+        "y": 0.25
+      },
+      {
+        "x": 1.0,
+        "y": 0.2667
+      },
+      {
+        "x": 1.0,
+        "y": 0.2857
+      },
+      {
+        "x": 1.0,
+        "y": 0.3077
+      },
+      {
+        "x": 1.0,
+        "y": 0.3333
+      },
+      {
+        "x": 1.0,
+        "y": 0.3636
+      },
+      {
+        "x": 1.0,
+        "y": 0.4
+      },
+      {
+        "x": 1.0,
+        "y": 0.4444
+      },
+      {
+        "x": 1.0,
+        "y": 0.5
+      },
+      {
+        "x": 1.0,
+        "y": 0.5714
+      },
+      {
+        "x": 1.0,
+        "y": 0.6667
+      },
+      {
+        "x": 1.0,
+        "y": 0.8
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      },
+      {
+        "x": 0.75,
+        "y": 1.0
+      },
+      {
+        "x": 0.5,
+        "y": 1.0
+      },
+      {
+        "x": 0.25,
+        "y": 1.0
+      },
+      {
+        "x": 0.0,
+        "y": 1.0
+      }
+    ],
+    "accuracy_warning": "In highly imbalanced transaction datasets (e.g., ~0.17% fraud rate), a trivial model predicting always-non-fraud achieves 99.8% raw accuracy while missing 100% of frauds. PR-AUC, Recall, and Precision are the primary decision-grade evaluation metrics.",
+    "algorithm": "LogisticRegression",
+    "dataset_origin": "Local Dataset",
+    "random_state": 42
+  },
+  "is_active": true
+}

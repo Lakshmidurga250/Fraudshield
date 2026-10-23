@@ -1,0 +1,161 @@
+{
+  "version": "logisticregression_20261023_095000",
+  "model_name": "LogisticRegression-Baseline",
+  "algorithm_type": "LogisticRegression",
+  "dataset_fingerprint": "96831a11701f3943",
+  "decision_threshold": 0.5,
+  "sha256_checksum": "60fb792100b61d9966514e0d70c681e53933dd84f2b7e266893d95b6c44f6646",
+  "artifact_filename": "logisticregression_20261023_095000.joblib",
+  "metrics": {
+    "roc_auc": 1.0,
+    "pr_auc": 1.0,
+    "precision": 1.0,
+    "recall": 0.9167,
+    "f1_score": 0.9565,
+    "raw_accuracy": 0.996,
+    "decision_threshold": 0.5,
+    "training_samples": 1008,
+    "test_samples": 252,
+    "confusion_matrix": {
+      "true_negatives": 240,
+      "false_positives": 0,
+      "false_negatives": 1,
+      "true_positives": 11
+    },
+    "class_distribution": {
+      "actual_fraud": 12,
+      "actual_non_fraud": 240,
+      "predicted_fraud": 11,
+      "predicted_non_fraud": 241
+    },
+    "roc_curve_points": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": 0.0,
+        "y": 0.0833
+      },
+      {
+        "x": 0.0,
+        "y": 1.0
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      }
+    ],
+    "pr_curve_points": [
+      {
+        "x": 1.0,
+        "y": 0.0476
+      },
+      {
+        "x": 1.0,
+        "y": 0.0496
+      },
+      {
+        "x": 1.0,
+        "y": 0.0517
+      },
+      {
+        "x": 1.0,
+        "y": 0.0541
+      },
+      {
+        "x": 1.0,
+        "y": 0.0566
+      },
+      {
+        "x": 1.0,
+        "y": 0.0594
+      },
+      {
+        "x": 1.0,
+        "y": 0.0625
+      },
+      {
+        "x": 1.0,
+        "y": 0.0659
+      },
+      {
+        "x": 1.0,
+        "y": 0.0698
+      },
+      {
+        "x": 1.0,
+        "y": 0.0741
+      },
+      {
+        "x": 1.0,
+        "y": 0.0789
+      },
+      {
+        "x": 1.0,
+        "y": 0.0845
+      },
+      {
+        "x": 1.0,
+        "y": 0.0909
+      },
+      {
+        "x": 1.0,
+        "y": 0.0984
+      },
+      {
+        "x": 1.0,
+        "y": 0.1071
+      },
+      {
+        "x": 1.0,
+        "y": 0.1176
+      },
+      {
+        "x": 1.0,
+        "y": 0.1304
+      },
+      {
+        "x": 1.0,
+        "y": 0.1463
+      },
+      {
+        "x": 1.0,
+        "y": 0.1667
+      },
+      {
+        "x": 1.0,
+        "y": 0.1935
+      },
+      {
+        "x": 1.0,
+        "y": 0.2308
+      },
+      {
+        "x": 1.0,
+        "y": 0.2857
+      },
+      {
+        "x": 1.0,
+        "y": 0.375
+      },
+      {
+        "x": 1.0,
+        "y": 0.5455
+      },
+      {
+        "x": 1.0,
+        "y": 1.0
+      },
+      {
+        "x": 0.1667,
+        "y": 1.0
+      }
+    ],
+    "accuracy_warning": "In highly imbalanced transaction datasets (e.g., ~0.17% fraud rate), a trivial model predicting always-non-fraud achieves 99.8% raw accuracy while missing 100% of frauds. PR-AUC, Recall, and Precision are the primary decision-grade evaluation metrics.",
+    "algorithm": "LogisticRegression",
+    "dataset_origin": "Local Dataset",
+    "random_state": 42
+  },
+  "is_active": true
+}
