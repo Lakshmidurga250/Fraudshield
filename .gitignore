@@ -42,3 +42,4 @@ models/artifacts/randomforest_*.json
 .idea/
 .DS_Store
 Thumbs.db
+*.zip
