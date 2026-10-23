@@ -73,6 +73,9 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(api_bp, url_prefix="/api/v1")
     app.register_blueprint(models_bp, url_prefix="/models")
 
+    # REST APIs accept direct JSON payloads from programmatic callers
+    csrf.exempt(api_bp)
+
 
 def _register_error_handlers(app: Flask) -> None:
     """Register centralized error handlers without leaking stack traces to clients."""
