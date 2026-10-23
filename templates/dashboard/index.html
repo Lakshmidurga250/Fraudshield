@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — FraudShield{% endblock %}
+{% block page_title %}Transaction Risk Dashboard{% endblock %}
+
+{% block content %}
+<!-- Metrics Overview Cards -->
+<section class="metrics-grid" aria-label="Key Performance Metrics">
+  <div class="metric-card">
+    <div class="metric-header">
+      <span class="metric-title">Total Assessments</span>
+      <div class="metric-icon-box" style="background-color: var(--lavender); color: var(--primary-purple);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-value">{{ metrics.total_assessments }}</div>
+    <div class="metric-caption">Lifetime user transactions evaluated</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-header">
+      <span class="metric-title">Potentially Suspicious</span>
+      <div class="metric-icon-box" style="background-color: var(--risk-high-bg); color: var(--risk-high);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      </div>
+    </div>
+    <div class="metric-value" style="color: var(--risk-high);">{{ metrics.suspicious_assessments }}</div>
+    <div class="metric-caption">Transactions exceeding decision threshold</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-header">
+      <span class="metric-title">Lower Model Risk</span>
+      <div class="metric-icon-box" style="background-color: var(--risk-low-bg); color: var(--risk-low);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-value" style="color: var(--risk-low);">{{ metrics.low_risk_assessments }}</div>
+    <div class="metric-caption">Normal low-risk profile classifications</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-header">
+      <span class="metric-title">Mean Risk Probability</span>
+      <div class="metric-icon-box" style="background-color: var(--lavender); color: var(--dark-purple);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-value">{{ "%.4f"|format(metrics.average_risk_score) }}</div>
+    <div class="metric-caption">Average estimated fraud score</div>
+  </div>
+</section>
+
+<!-- Visual Analytics Charts Row -->
+<div class="charts-grid">
+  <div class="chart-card">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <h3>Risk Score Timeline</h3>
+        <p>Recent transaction estimated scores plotted against decision threshold</p>
+      </div>
+      <span style="font-size: 12px; color: var(--secondary-text);">Last 20 assessments</span>
+    </div>
+    <div class="chart-container">
+      <canvas id="timelineChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>Risk Tier Distribution</h3>
+    <p>Categorization of evaluated transactions</p>
+    <div class="chart-container" style="height: 220px;">
+      <canvas id="distributionChart"></canvas>
+    </div>
+    <div style="display: flex; justify-content: space-around; margin-top: 16px; font-size: 12px; font-weight: 600;">
+      <span style="color: var(--risk-high);">● High ({{ metrics.risk_distribution.high }})</span>
+      <span style="color: var(--risk-medium);">● Medium ({{ metrics.risk_distribution.medium }})</span>
+      <span style="color: var(--risk-low);">● Low ({{ metrics.risk_distribution.low }})</span>
+    </div>
+  </div>
+</div>
+
+<!-- Active Model Benchmark Card -->
+{% if metrics.active_model %}
+<div class="content-card" style="border-left: 4px solid var(--primary-purple);">
+  <div class="card-header-flex">
+    <div>
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--primary-text);">
+        Verified Active Pipeline: {{ metrics.active_model.model_name }}
+      </h3>
+      <p style="font-size: 13px; color: var(--secondary-text); margin-top: 2px;">
+        Version: <code>{{ metrics.active_model.version }}</code> | Dataset Fingerprint: <code>{{ metrics.active_model.dataset_fingerprint }}</code>
+      </p>
+    </div>
+    <a href="{{ url_for('models.models_view') }}" class="btn btn-secondary btn-sm">Inspect ML Registry</a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; text-align: center;">
+    <div style="background-color: #F8F7FC; padding: 12px; border-radius: var(--radius-md);">
+      <div style="font-size: 11px; color: var(--secondary-text); font-weight: 600;">PR-AUC</div>
+      <div style="font-size: 18px; font-weight: 700; color: var(--primary-purple);">{{ metrics.active_model.metrics.pr_auc }}</div>
+    </div>
+    <div style="background-color: #F8F7FC; padding: 12px; border-radius: var(--radius-md);">
+      <div style="font-size: 11px; color: var(--secondary-text); font-weight: 600;">ROC-AUC</div>
+      <div style="font-size: 18px; font-weight: 700; color: var(--dark-purple);">{{ metrics.active_model.metrics.roc_auc }}</div>
+    </div>
+    <div style="background-color: #F8F7FC; padding: 12px; border-radius: var(--radius-md);">
+      <div style="font-size: 11px; color: var(--secondary-text); font-weight: 600;">PRECISION</div>
+      <div style="font-size: 18px; font-weight: 700; color: var(--primary-text);">{{ metrics.active_model.metrics.precision }}</div>
+    </div>
+    <div style="background-color: #F8F7FC; padding: 12px; border-radius: var(--radius-md);">
+      <div style="font-size: 11px; color: var(--secondary-text); font-weight: 600;">RECALL</div>
+      <div style="font-size: 18px; font-weight: 700; color: var(--primary-text);">{{ metrics.active_model.metrics.recall }}</div>
+    </div>
+    <div style="background-color: #F8F7FC; padding: 12px; border-radius: var(--radius-md);">
+      <div style="font-size: 11px; color: var(--secondary-text); font-weight: 600;">F1-SCORE</div>
+      <div style="font-size: 18px; font-weight: 700; color: var(--primary-text);">{{ metrics.active_model.metrics.f1_score }}</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent Assessments Table -->
+<div class="content-card">
+  <div class="card-header-flex">
+    <div>
+      <h3 style="font-size: 16px; font-weight: 700;">Recent Transaction Assessments</h3>
+      <p style="font-size: 13px; color: var(--secondary-text);">Recently evaluated vectors from your personal transaction log</p>
+    </div>
+    {% if metrics.recent_assessments %}
+    <a href="{{ url_for('history.history_view') }}" class="btn btn-secondary btn-sm">View Full History</a>
+    {% endif %}
+  </div>
+
+  {% if metrics.recent_assessments %}
+  <div class="data-table-wrapper">
+    <table class="data-table" aria-label="Recent Assessments">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Date & Time</th>
+          <th>Amount ($)</th>
+          <th>Estimated Score</th>
+          <th>Classification</th>
+          <th>Risk Tier</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in metrics.recent_assessments %}
+        <tr>
+          <td><strong style="color: var(--primary-purple);">{{ txn.transaction_reference }}</strong></td>
+          <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>${{ "%.2f"|format(txn.amount) }}</td>
+          <td><code>{{ "%.4f"|format(txn.estimated_score) }}</code></td>
+          <td>
+            {% if txn.classification == 'Potentially Suspicious' %}
+              <span class="badge badge-high">{{ txn.classification }}</span>
+            {% else %}
+              <span class="badge badge-low">{{ txn.classification }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if txn.risk_tier == 'High' %}
+              <span class="badge badge-high">High</span>
+            {% elif txn.risk_tier == 'Medium' %}
+              <span class="badge badge-medium">Medium</span>
+            {% else %}
+              <span class="badge badge-low">Low</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{{ url_for('predictions.view_assessment', reference=txn.transaction_reference) }}" class="btn btn-secondary btn-sm">
+              Details
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+    </div>
+    <h4>No transaction assessments yet</h4>
+    <p>Run your first financial transaction assessment to populate analytics and evaluate ML risk drivers.</p>
+    <a href="{{ url_for('predictions.new_prediction') }}" class="btn btn-primary" id="btn-empty-start">Run First Assessment</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. Timeline Chart
+    const timelineLabels = {{ metrics.timeline_chart.labels | tojson }};
+    const timelineScores = {{ metrics.timeline_chart.scores | tojson }};
+    const timelineThresholds = {{ metrics.timeline_chart.thresholds | tojson }};
+
+    new Chart('timelineChart', {
+      type: 'line',
+      data: {
+        labels: timelineLabels,
+        datasets: [
+          {
+            label: 'Estimated Risk Score',
+            data: timelineScores,
+            borderColor: '#7865E8',
+            borderWidth: 2
+          },
+          {
+            label: 'Decision Threshold',
+            data: timelineThresholds,
+            borderColor: '#DC3545',
+            borderWidth: 1.5,
+            borderDash: [4, 4]
+          }
+        ]
+      }
+    });
+
+    // 2. Risk Tier Distribution Doughnut
+    const distData = [
+      {{ metrics.risk_distribution.high }},
+      {{ metrics.risk_distribution.medium }},
+      {{ metrics.risk_distribution.low }}
+    ];
+
+    new Chart('distributionChart', {
+      type: 'doughnut',
+      data: {
+        labels: ['High', 'Medium', 'Low'],
+        datasets: [{
+          data: distData,
+          backgroundColor: ['#DC3545', '#D97706', '#198754']
+        }]
+      }
+    });
+  });
+</script>
+{% endblock %}

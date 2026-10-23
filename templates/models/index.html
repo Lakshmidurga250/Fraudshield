@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Model Registry & Benchmarks — FraudShield{% endblock %}
+{% block page_title %}ML Model Registry{% endblock %}
+
+{% block content %}
+<!-- Model Training Control Card -->
+<div class="content-card">
+  <div class="card-header-flex">
+    <div>
+      <h3 style="font-size: 18px; font-weight: 700;">Train & Register Model Pipeline</h3>
+      <p style="font-size: 13px; color: var(--secondary-text); margin-top: 2px;">
+        Execute a reproducible training run using stratified train/test split, column transformations, and evaluation.
+      </p>
+    </div>
+    <div style="font-size: 13px;">
+      Dataset Mode: 
+      {% if has_real_data %}
+        <span class="badge badge-low">Research Dataset Present (creditcard.csv)</span>
+      {% else %}
+        <span class="badge badge-medium">Synthetic Benchmark Mode (sample_creditcard.csv)</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('models.train_model_action') }}" style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div style="flex: 1; min-width: 220px;">
+      <label class="form-label">Algorithm Architecture</label>
+      <select name="algorithm" class="form-control" style="font-size: 13px;">
+        <option value="logistic_regression">Logistic Regression (Interpretable Baseline + Balanced Weights)</option>
+        <option value="random_forest">Random Forest Classifier (Ensemble Comparative + Tree Depth 12)</option>
+      </select>
+    </div>
+
+    <div style="width: 160px;">
+      <label class="form-label">Decision Threshold</label>
+      <input type="number" name="threshold" value="0.50" min="0.05" max="0.95" step="0.05" class="form-control" style="font-size: 13px;">
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="btn-train-model" style="padding: 10px 20px;">
+      Train & Register Pipeline
+    </button>
+  </form>
+</div>
+
+<!-- Registered Models Table -->
+<div class="content-card">
+  <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Registered ML Model Artifacts</h3>
+  <p style="font-size: 13px; color: var(--secondary-text); margin-bottom: 20px;">
+    Cryptographically verified local model pipelines. Each artifact includes SHA-256 verification and out-of-fold metrics.
+  </p>
+
+  {% if models %}
+  <div class="data-table-wrapper">
+    <table class="data-table" aria-label="Model Registry">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Model Architecture</th>
+          <th>Version</th>
+          <th>Train / Test Samples</th>
+          <th>PR-AUC</th>
+          <th>ROC-AUC</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1-Score</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in models %}
+        {% set is_active = active_model and active_model.version == m.version %}
+        <tr style="{% if is_active %}background-color: #F8F6FF; font-weight: 500;{% endif %}">
+          <td>
+            {% if is_active %}
+              <span class="badge badge-low">ACTIVE</span>
+            {% else %}
+              <span class="badge" style="background-color: #F0EFF6; color: var(--secondary-text);">STANDBY</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ m.model_name }}</strong></td>
+          <td><code>{{ m.version }}</code></td>
+          <td>{{ m.metrics.training_samples }} / {{ m.metrics.test_samples }}</td>
+          <td><strong style="color: var(--primary-purple);">{{ m.metrics.pr_auc }}</strong></td>
+          <td>{{ m.metrics.roc_auc }}</td>
+          <td>{{ m.metrics.precision }}</td>
+          <td>{{ m.metrics.recall }}</td>
+          <td>{{ m.metrics.f1_score }}</td>
+          <td>
+            {% if not is_active %}
+            <form action="{{ url_for('models.activate_model_action', version=m.version) }}" method="POST" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-secondary btn-sm">Set Active</button>
+            </form>
+            {% else %}
+              <span style="font-size: 12px; color: var(--risk-low); font-weight: 600;">Inference Active</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+    </div>
+    <h4>No registered models found</h4>
+    <p>Train your first baseline Logistic Regression or Random Forest model using the control panel above.</p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Methodology & Academic Note -->
+<div class="content-card" style="background-color: #FAFAFD;">
+  <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-text); margin-bottom: 8px;">
+    Why Accuracy is Insufficient for Financial Fraud Detection
+  </h4>
+  <p style="font-size: 13px; color: var(--secondary-text); line-height: 1.6; margin-bottom: 12px;">
+    In credit card transaction datasets, fraudulent transactions typically represent fewer than 0.2% of all activity. A naive model that universally predicts "Normal" achieves <strong>99.8% raw accuracy</strong> while failing to intercept a single fraudulent event.
+  </p>
+  <p style="font-size: 13px; color: var(--secondary-text); line-height: 1.6;">
+    Therefore, FraudShield prioritizes <strong>PR-AUC (Precision-Recall Area Under Curve)</strong>, <strong>Recall (Sensitivity)</strong>, and <strong>Precision</strong> to rigorously measure real detection utility without false sense of security.
+  </p>
+</div>
+{% endblock %}

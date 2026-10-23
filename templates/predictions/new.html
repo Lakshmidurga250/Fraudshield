@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluate Transaction Risk — FraudShield{% endblock %}
+{% block page_title %}New Risk Assessment{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="card-header-flex">
+    <div>
+      <h3 style="font-size: 18px; font-weight: 700;">Transaction Feature Vector Input</h3>
+      <p style="font-size: 13px; color: var(--secondary-text); margin-top: 2px;">
+        Provide anonymized financial features (Time, Amount, V1–V28) to estimate probability of suspicious behavior.
+      </p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-fill-normal">
+        Load Low-Risk Sample
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-fill-suspicious">
+        Load Suspicious Sample
+      </button>
+    </div>
+  </div>
+
+  <div style="background-color: var(--lavender); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 24px; font-size: 13px; color: var(--dark-purple);">
+    <strong>Notice:</strong> This platform assesses mathematical PCA feature distributions based on the Credit Card Fraud Detection research schema. <em>Never enter real credit card numbers, CVVs, or personal banking credentials.</em>
+  </div>
+
+  <form method="POST" action="{{ url_for('predictions.new_prediction') }}" novalidate>
+    {{ form.hidden_tag() }}
+
+    <!-- Core Transaction Attributes -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 28px;">
+      <div class="form-group">
+        <label class="form-label" for="amount">Transaction Amount ($)</label>
+        {{ form.amount(class="form-control" + (" is-invalid" if form.amount.errors else ""), id="amount", step="0.01") }}
+        {% for error in form.amount.errors %}
+          <div class="form-error">{{ error }}</div>
+        {% endfor %}
+        <span style="font-size: 11px; color: var(--secondary-text);">Financial transaction value in currency units.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="time_val">Elapsed Time (Seconds)</label>
+        {{ form.time_val(class="form-control" + (" is-invalid" if form.time_val.errors else ""), id="time_val", step="1.0") }}
+        {% for error in form.time_val.errors %}
+          <div class="form-error">{{ error }}</div>
+        {% endfor %}
+        <span style="font-size: 11px; color: var(--secondary-text);">Elapsed seconds from first dataset transaction.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="decision_threshold">Decision Threshold</label>
+        {{ form.decision_threshold(class="form-control" + (" is-invalid" if form.decision_threshold.errors else ""), id="decision_threshold", step="0.05") }}
+        {% for error in form.decision_threshold.errors %}
+          <div class="form-error">{{ error }}</div>
+        {% endfor %}
+        <span style="font-size: 11px; color: var(--secondary-text);">Default is 0.50 (customizable 0.05 to 0.95).</span>
+      </div>
+    </div>
+
+    <!-- PCA Features V1 - V28 Grid -->
+    <div style="margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-text); text-transform: uppercase; letter-spacing: 0.5px;">
+          Anonymized PCA Transformed Features (V1 – V28)
+        </h4>
+        <span style="font-size: 12px; color: var(--secondary-text);">Principal components from data source</span>
+      </div>
+
+      <div class="form-grid-pca">
+        {% for i in range(1, 29) %}
+        {% set field = form['v' ~ i] %}
+        <div style="display: flex; flex-direction: column;">
+          <label style="font-size: 11px; font-weight: 600; color: var(--secondary-text); margin-bottom: 4px;" for="v{{ i }}">
+            V{{ i }}
+          </label>
+          {{ field(class="form-control", id="v" ~ i, step="0.01", style="padding: 6px 10px; font-size: 13px;") }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+      <a href="{{ url_for('dashboard.dashboard_view') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary" id="btn-submit-prediction" style="padding: 12px 28px;">
+        Evaluate Transaction Risk Score
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

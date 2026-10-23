@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction Audit Log — FraudShield{% endblock %}
+{% block page_title %}Audit History{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="card-header-flex">
+    <div>
+      <h3 style="font-size: 18px; font-weight: 700;">Transaction Assessment History</h3>
+      <p style="font-size: 13px; color: var(--secondary-text); margin-top: 2px;">
+        Audited log of your evaluated transactions with risk probabilities, classifications, and thresholds.
+      </p>
+    </div>
+    <div>
+      <a href="{{ url_for('history.export_csv') }}" class="btn btn-secondary btn-sm" id="btn-export-csv">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Export CSV</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Controls -->
+  <form method="GET" action="{{ url_for('history.history_view') }}" style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 200px;">
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Search by reference (e.g. TXN-20261023)..." class="form-control" style="font-size: 13px;">
+    </div>
+    <div style="width: 160px;">
+      <select name="tier" class="form-control" style="font-size: 13px;" onchange="this.form.submit()">
+        <option value="">All Risk Tiers</option>
+        <option value="High" {% if tier_filter == 'High' %}selected{% endif %}>High Risk</option>
+        <option value="Medium" {% if tier_filter == 'Medium' %}selected{% endif %}>Medium Risk</option>
+        <option value="Low" {% if tier_filter == 'Low' %}selected{% endif %}>Low Risk</option>
+      </select>
+    </div>
+    <div style="width: 170px;">
+      <select name="sort" class="form-control" style="font-size: 13px;" onchange="this.form.submit()">
+        <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Newest First</option>
+        <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>Oldest First</option>
+        <option value="score_desc" {% if sort_by == 'score_desc' %}selected{% endif %}>Highest Score</option>
+        <option value="score_asc" {% if sort_by == 'score_asc' %}selected{% endif %}>Lowest Score</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+    {% if search_query or tier_filter or sort_by != 'date_desc' %}
+      <a href="{{ url_for('history.history_view') }}" class="btn btn-secondary btn-sm">Reset</a>
+    {% endif %}
+  </form>
+
+  {% if pagination.items %}
+  <div class="data-table-wrapper">
+    <table class="data-table" aria-label="Transaction Audit Records">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Timestamp (UTC)</th>
+          <th>Amount ($)</th>
+          <th>Score</th>
+          <th>Threshold</th>
+          <th>Classification</th>
+          <th>Risk Tier</th>
+          <th>Model Pipeline</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for txn in pagination.items %}
+        <tr>
+          <td><strong style="color: var(--primary-purple);">{{ txn.transaction_reference }}</strong></td>
+          <td>{{ txn.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>${{ "%.2f"|format(txn.amount) }}</td>
+          <td><code>{{ "%.4f"|format(txn.estimated_score) }}</code></td>
+          <td><code>{{ "%.2f"|format(txn.decision_threshold) }}</code></td>
+          <td>
+            {% if txn.classification == 'Potentially Suspicious' %}
+              <span class="badge badge-high">{{ txn.classification }}</span>
+            {% else %}
+              <span class="badge badge-low">{{ txn.classification }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if txn.risk_tier == 'High' %}
+              <span class="badge badge-high">High</span>
+            {% elif txn.risk_tier == 'Medium' %}
+              <span class="badge badge-medium">Medium</span>
+            {% else %}
+              <span class="badge badge-low">Low</span>
+            {% endif %}
+          </td>
+          <td><span style="font-size: 12px; color: var(--secondary-text);">{{ txn.model_name }}</span></td>
+          <td>
+            <a href="{{ url_for('predictions.view_assessment', reference=txn.transaction_reference) }}" class="btn btn-secondary btn-sm">
+              Inspect
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; font-size: 13px; color: var(--secondary-text);">
+    <div>
+      Showing {{ pagination.items|length }} of {{ pagination.total }} records
+    </div>
+    <div style="display: flex; gap: 8px;">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('history.history_view', page=pagination.prev_num, tier=tier_filter, q=search_query, sort=sort_by) }}" class="btn btn-secondary btn-sm">&larr; Previous</a>
+      {% endif %}
+      <span style="display: flex; align-items: center; padding: 0 8px; font-weight: 600;">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('history.history_view', page=pagination.next_num, tier=tier_filter, q=search_query, sort=sort_by) }}" class="btn btn-secondary btn-sm">Next &rarr;</a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </div>
+    <h4>No transaction assessments match the criteria</h4>
+    <p>Try modifying your filters or submit a new transaction assessment.</p>
+    <a href="{{ url_for('predictions.new_prediction') }}" class="btn btn-primary btn-sm">Assess New Transaction</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

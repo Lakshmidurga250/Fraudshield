@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — FraudShield{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 40px auto; padding: 20px;">
+  <div style="text-align: center; margin-bottom: 28px;">
+    <div class="brand-logo-icon" style="width: 48px; height: 48px; font-size: 22px; margin: 0 auto 16px;">FS</div>
+    <h2 style="font-size: 24px; font-weight: 700; color: var(--primary-text); margin-bottom: 6px;">Sign in to FraudShield</h2>
+    <p style="color: var(--secondary-text); font-size: 14px;">Intelligent Transaction Risk & Analytics Platform</p>
+  </div>
+
+  <div class="content-card" style="box-shadow: var(--shadow-md);">
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="form-group">
+        <label class="form-label" for="identifier">Username or Email</label>
+        {{ form.identifier(class="form-control" + (" is-invalid" if form.identifier.errors else ""), id="identifier", placeholder="e.g. analyst@example.com", autofocus=True) }}
+        {% for error in form.identifier.errors %}
+          <div class="form-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
+        {% for error in form.password.errors %}
+          <div class="form-error">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--secondary-text); cursor: pointer;">
+          {{ form.remember_me() }}
+          <span>Remember this session</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;" id="btn-submit-login">
+        Sign In
+      </button>
+    </form>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; font-size: 14px; color: var(--secondary-text);">
+    Don't have an account? 
+    <a href="{{ url_for('auth.register') }}" style="color: var(--primary-purple); font-weight: 600; text-decoration: none;">Create one here</a>
+  </div>
+</div>
+{% endblock %}

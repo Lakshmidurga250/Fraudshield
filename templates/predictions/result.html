@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Assessment Result: {{ assessment.transaction_reference }} — FraudShield{% endblock %}
+{% block page_title %}Assessment Details{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+  <div>
+    <a href="{{ url_for('history.history_view') }}" style="color: var(--secondary-text); text-decoration: none; font-size: 13px; font-weight: 500;">
+      &larr; Back to Transaction Audit Log
+    </a>
+    <h2 style="font-size: 22px; font-weight: 700; color: var(--primary-text); margin-top: 4px;">
+      Reference: {{ assessment.transaction_reference }}
+    </h2>
+  </div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('predictions.new_prediction') }}" class="btn btn-primary btn-sm">+ New Assessment</a>
+  </div>
+</div>
+
+<!-- Primary Classification Score Hero -->
+<div class="content-card" style="box-shadow: var(--shadow-md); border-top: 5px solid {% if assessment.risk_tier == 'High' %}var(--risk-high){% elif assessment.risk_tier == 'Medium' %}var(--risk-medium){% else %}var(--risk-low){% endif %};">
+  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px;">
+    <div>
+      <div style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary-text); margin-bottom: 4px;">
+        Model Classification Outcome
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        {% if assessment.risk_tier == 'High' %}
+          <span class="badge badge-high" style="font-size: 16px; padding: 6px 14px;">{{ assessment.classification }}</span>
+        {% elif assessment.risk_tier == 'Medium' %}
+          <span class="badge badge-medium" style="font-size: 16px; padding: 6px 14px;">{{ assessment.classification }} (Elevated)</span>
+        {% else %}
+          <span class="badge badge-low" style="font-size: 16px; padding: 6px 14px;">{{ assessment.classification }}</span>
+        {% endif %}
+        <span style="font-size: 13px; color: var(--secondary-text);">Risk Tier: <strong>{{ assessment.risk_tier }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Probability Score Callout -->
+    <div style="text-align: right;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--secondary-text); text-transform: uppercase;">
+        Estimated Risk Score
+      </div>
+      <div style="font-size: 36px; font-weight: 800; color: var(--primary-text); line-height: 1.1;">
+        {{ "%.4f"|format(assessment.estimated_score) }}
+      </div>
+      <div style="font-size: 12px; color: var(--secondary-text);">
+        Decision Threshold: <code>{{ "%.2f"|format(assessment.decision_threshold) }}</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- Score Meter Bar -->
+  <div style="margin-top: 24px;">
+    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--secondary-text); margin-bottom: 6px;">
+      <span>0.00 (Minimal Risk)</span>
+      <span>Threshold: {{ "%.2f"|format(assessment.decision_threshold) }}</span>
+      <span>1.00 (Extreme Suspicion)</span>
+    </div>
+    <div style="height: 12px; background-color: #EEEAFF; border-radius: 6px; overflow: hidden; position: relative;">
+      <div style="height: 100%; width: {{ (assessment.estimated_score * 100)|round }}%; background: linear-gradient(90deg, #7865E8, {% if assessment.risk_tier == 'High' %}#DC3545{% else %}#198754{% endif %}); transition: width 0.5s ease;"></div>
+    </div>
+  </div>
+
+  <!-- Human Readable Explanation Summary -->
+  {% if assessment.explanation_summary %}
+  <div style="margin-top: 24px; padding: 16px; background-color: #F8F7FC; border-radius: var(--radius-md); border-left: 3px solid var(--primary-purple);">
+    <div style="font-size: 12px; font-weight: 700; color: var(--dark-purple); text-transform: uppercase; margin-bottom: 4px;">
+      Explainable AI (XAI) Synthesis
+    </div>
+    <p style="font-size: 14px; color: var(--primary-text);">
+      {{ assessment.explanation_summary }}
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Local Directional Feature Contributions -->
+<div class="content-card">
+  <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">
+    Feature Contributions & Directional Risk Drivers
+  </h3>
+  <p style="font-size: 13px; color: var(--secondary-text); margin-bottom: 20px;">
+    Analysis of which features pushed the model probability higher (risk-increasing) or lower (risk-decreasing).
+  </p>
+
+  {% if assessment.feature_contributions %}
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    {% for item in assessment.feature_contributions %}
+    <div style="background-color: #FDFDFE; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <strong style="color: var(--primary-purple); font-size: 15px;">{{ item.feature }}</strong>
+        <span style="font-size: 12px; color: var(--secondary-text); margin-left: 8px;">
+          Observed Value: <code>{{ item.raw_value }}</code>
+        </span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        {% if item.direction == 'Risk Increasing' %}
+          <span class="badge badge-high">{{ item.direction }}</span>
+          <span style="font-weight: 700; font-size: 14px; color: var(--risk-high);">+{{ item.contribution }}</span>
+        {% elif item.direction == 'Risk Decreasing' %}
+          <span class="badge badge-low">{{ item.direction }}</span>
+          <span style="font-weight: 700; font-size: 14px; color: var(--risk-low);">{{ item.contribution }}</span>
+        {% else %}
+          <span class="badge badge-medium">{{ item.direction }}</span>
+          <span style="font-weight: 700; font-size: 14px; color: var(--primary-text);">{{ item.global_importance }}</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="font-size: 13px; color: var(--secondary-text);">No local feature breakdown available for this model type.</p>
+  {% endif %}
+
+  <div style="margin-top: 20px; font-size: 12px; color: var(--secondary-text); line-height: 1.5; background-color: #FAFAFC; padding: 12px; border-radius: var(--radius-sm);">
+    <strong>Academic Disclaimer:</strong> Statistical feature contribution coefficients represent mathematical alignment with patterns learned from training data. They do not constitute deterministic real-world proof of fraud or causal mechanisms.
+  </div>
+</div>
+
+<!-- Metadata & Provenance -->
+<div class="content-card">
+  <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Assessment Metadata & Provenance</h3>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 13px;">
+    <div>
+      <span style="color: var(--secondary-text);">Amount Evaluated:</span>
+      <div style="font-weight: 600; color: var(--primary-text);">${{ "%.2f"|format(assessment.amount) }}</div>
+    </div>
+    <div>
+      <span style="color: var(--secondary-text);">Evaluated At (UTC):</span>
+      <div style="font-weight: 600; color: var(--primary-text);">{{ assessment.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+    </div>
+    <div>
+      <span style="color: var(--secondary-text);">Model Name:</span>
+      <div style="font-weight: 600; color: var(--primary-text);">{{ assessment.model_name }}</div>
+    </div>
+    <div>
+      <span style="color: var(--secondary-text);">Pipeline Version:</span>
+      <div style="font-weight: 600; color: var(--primary-text);"><code>{{ assessment.model_version }}</code></div>
+    </div>
+    <div>
+      <span style="color: var(--secondary-text);">Inference Latency:</span>
+      <div style="font-weight: 600; color: var(--primary-text);">{{ assessment.latency_ms }} ms</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
