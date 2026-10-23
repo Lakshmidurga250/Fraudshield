@@ -1,6 +1,6 @@
 # Security Policy — FraudShield
 
-## Reporting Security Issues
+### Reporting Security Issues
 
 We take the security of FraudShield and user privacy seriously. If you discover a vulnerability or security boundary issue, please do not open a public GitHub issue.
 
