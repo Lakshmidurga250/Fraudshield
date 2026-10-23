@@ -1,8 +1,8 @@
 """Unit test verifying Enterprise Rule Engines and evaluate_rule functions."""
 
 from enterprise.bin_network.rules_part_01 import BinRuleEnginePart01
-from enterprise.fraud_vectors.rules_part_01 import SigRuleEnginePart01
 from enterprise.compliance_rbi.rules_part_01 import RbiRuleEnginePart01
+from enterprise.fraud_vectors.rules_part_01 import SigRuleEnginePart01
 
 
 def test_bin_rule_engine_evaluation():

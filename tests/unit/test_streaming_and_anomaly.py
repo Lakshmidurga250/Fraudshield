@@ -1,7 +1,7 @@
 """Unit tests verifying streaming processors and anomaly estimators."""
 
-from enterprise.streaming.processor_part_01 import StreamingProcessorPart01
 from enterprise.anomaly.detector_part_01 import AnomalyDetectorPart01
+from enterprise.streaming.processor_part_01 import StreamingProcessorPart01
 
 
 def test_streaming_processor():

@@ -33,7 +33,7 @@ def get_github_token() -> str:
         capture_output=True,
         check=True,
     )
-    lines = dict(l.split("=", 1) for l in res.stdout.splitlines() if "=" in l)
+    lines = dict(line_item.split("=", 1) for line_item in res.stdout.splitlines() if "=" in line_item)
     token = lines.get("password", "")
     if not token:
         raise RuntimeError("Could not retrieve GitHub token from git credential helper.")

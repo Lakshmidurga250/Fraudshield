@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from scripts.generate_enterprise_codebase import (
+from scripts.generate_enterprise_codebase import (  # noqa: E402
     MODULE_CATEGORIES,
     generate_module_content,
 )
