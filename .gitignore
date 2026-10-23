@@ -1,0 +1,40 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Environment
+.venv/
+venv/
+ENV/
+env/
+.env
+
+# Database and instances
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Large datasets (keep sample synthetic fixtures only)
+datasets/*.csv
+!datasets/sample/
+datasets/creditcard.csv
+
+# Model binary artifacts (generated locally)
+models/*.joblib
+!models/.gitkeep
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
