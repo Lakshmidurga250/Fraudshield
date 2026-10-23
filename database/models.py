@@ -45,6 +45,23 @@ class User(UserMixin, db.Model):
         cascade="all, delete-orphan",
     )
 
+    def __init__(
+        self,
+        username: str,
+        email: str,
+        password_hash: Optional[str] = None,
+        is_active: bool = True,
+        is_admin: bool = False,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        self.username = username
+        self.email = email
+        if password_hash is not None:
+            self.password_hash = password_hash
+        self.is_active = is_active
+        self.is_admin = is_admin
+
     def set_password(self, password: str) -> None:
         """Hash password using Werkzeug secure PBKDF2/scrypt implementation."""
         if not password or len(password) < 8:
@@ -99,6 +116,49 @@ class TransactionAssessment(db.Model):
     created_at = db.Column(
         db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True
     )
+
+    def __init__(
+        self,
+        user_id: int,
+        transaction_reference: str,
+        amount: float,
+        estimated_score: float,
+        classification: str,
+        risk_tier: str,
+        model_version: str,
+        model_name: str,
+        time_val: float = 0.0,
+        decision_threshold: float = 0.50,
+        pca_features_json: Optional[str] = None,
+        pca_features: Optional[Dict[str, float]] = None,
+        explanation_summary: Optional[str] = None,
+        feature_contributions: Optional[List[Dict[str, Any]]] = None,
+        latency_ms: Optional[float] = None,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        self.user_id = user_id
+        self.transaction_reference = transaction_reference
+        self.amount = amount
+        self.estimated_score = estimated_score
+        self.classification = classification
+        self.risk_tier = risk_tier
+        self.model_version = model_version
+        self.model_name = model_name
+        self.time_val = time_val
+        self.decision_threshold = decision_threshold
+        if pca_features is not None:
+            self.pca_features = pca_features
+        elif pca_features_json is not None:
+            self.pca_features_json = pca_features_json
+        else:
+            self.pca_features_json = "{}"
+        if explanation_summary is not None:
+            self.explanation_summary = explanation_summary
+        if feature_contributions is not None:
+            self.feature_contributions = feature_contributions
+        if latency_ms is not None:
+            self.latency_ms = latency_ms
 
     @property
     def pca_features(self) -> Dict[str, float]:
@@ -209,6 +269,44 @@ class ModelMetadataRecord(db.Model):
     sha256_checksum = db.Column(db.String(64), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
+    def __init__(
+        self,
+        version: str,
+        model_name: str,
+        algorithm_type: str,
+        dataset_fingerprint: str,
+        training_samples: int,
+        test_samples: int,
+        roc_auc: float,
+        pr_auc: float,
+        precision_val: float,
+        recall_val: float,
+        f1_val: float,
+        metrics_json: str,
+        artifact_path: str,
+        sha256_checksum: str,
+        decision_threshold: float = 0.50,
+        is_active: bool = False,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        self.version = version
+        self.model_name = model_name
+        self.algorithm_type = algorithm_type
+        self.dataset_fingerprint = dataset_fingerprint
+        self.training_samples = training_samples
+        self.test_samples = test_samples
+        self.roc_auc = roc_auc
+        self.pr_auc = pr_auc
+        self.precision_val = precision_val
+        self.recall_val = recall_val
+        self.f1_val = f1_val
+        self.metrics_json = metrics_json
+        self.artifact_path = artifact_path
+        self.sha256_checksum = sha256_checksum
+        self.decision_threshold = decision_threshold
+        self.is_active = is_active
+
     @property
     def metrics(self) -> Dict[str, Any]:
         try:
@@ -259,6 +357,22 @@ class AuditLog(db.Model):
     created_at = db.Column(
         db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False, index=True
     )
+
+    def __init__(
+        self,
+        action: str,
+        user_id: Optional[int] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+        details: Optional[str] = None,
+        **kwargs: Any,
+    ):
+        super().__init__(**kwargs)
+        self.action = action
+        self.user_id = user_id
+        self.ip_address = ip_address
+        self.user_agent = user_agent
+        self.details = details
 
     def to_dict(self) -> Dict[str, Any]:
         return {

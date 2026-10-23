@@ -1,7 +1,7 @@
 import pytest
 
 from app import create_app
-from database.models import User
+from database.models import TransactionAssessment, User
 from extensions import db
 from ml.data.synthetic import SyntheticDataGenerator
 from ml.training.trainer import ModelTrainer
@@ -33,7 +33,6 @@ def client(app):
 @pytest.fixture(scope="function")
 def test_users(app):
     """Provide two distinct test users to verify cross-user isolation."""
-    from database.models import TransactionAssessment, User
     with app.app_context():
         # Clear existing assessments and users for clean isolation tests
         db.session.query(TransactionAssessment).delete()

@@ -31,6 +31,10 @@ datasets/creditcard.csv
 
 # Model binary artifacts (generated locally)
 models/*.joblib
+models/artifacts/*.joblib
+models/artifacts/logisticregression_*.json
+models/artifacts/randomforest_*.json
+!models/artifacts/active_model.json
 !models/.gitkeep
 
 # IDE and OS
